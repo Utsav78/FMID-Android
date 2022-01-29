@@ -35,6 +35,7 @@
         android:layout_margin="20dp"
         android:textAllCaps="false"
         android:padding="12dp"
+        android:onClick="openGallery"
         android:layout_gravity="center_horizontal"
         />
 
