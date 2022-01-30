@@ -1,11 +1,14 @@
 package com.codewithutsav.fmidandroid
 
+import android.R.attr
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.codewithutsav.fmidandroid.databinding.ActivityMainBinding
+import com.theartofdev.edmodo.cropper.CropImage
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,5 +39,16 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK && data != null && data.data != null){
             binding.image.setImageURI(data.data)
         }
+        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode === RESULT_OK) {
+                val resultUri: Uri = result.uri
+            } else if (resultCode === CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                val error = result.error
+            }
+        }
+    }
+
+    fun openCamera(view: View) {
     }
 }
