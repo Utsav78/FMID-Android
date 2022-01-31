@@ -20,25 +20,15 @@
         android:id="@+id/btnCamera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/camera"
-        android:onClick="openCamera"
+        android:text="Pick Image"
+        android:onClick="pickImage"
         android:textAllCaps="false"
         android:padding="12dp"
         android:layout_margin="20dp"
         android:layout_gravity="center_horizontal"
         />
 
-    <Button
-        android:id="@+id/btnGallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_from_gallery"
-        android:layout_margin="20dp"
-        android:textAllCaps="false"
-        android:padding="12dp"
-        android:onClick="openGallery"
-        android:layout_gravity="center_horizontal"
-        />
+
 
 
 
