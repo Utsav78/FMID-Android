@@ -28,6 +28,18 @@
         android:layout_gravity="center_horizontal"
         />
 
+    <Button
+        android:id="@+id/btnPredict"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Predict"
+        android:onClick="pickImage"
+        android:textAllCaps="false"
+        android:padding="12dp"
+        android:layout_margin="20dp"
+        android:layout_gravity="center_horizontal"
+        />
+
 
 
 
