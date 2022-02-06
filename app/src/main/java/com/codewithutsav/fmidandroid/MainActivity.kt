@@ -13,12 +13,18 @@ import com.codewithutsav.fmidandroid.databinding.ActivityMainBinding
 import com.codewithutsav.fmidandroid.ml.Model
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding:ActivityMainBinding
     private val TAG = "MainActivity"
+    private val instruments = arrayOf("Bansuri","Damaha","Damaru","Madal","Murchuga","Sarangi")
+    val imageSize = 224
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,19 +60,60 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun outputGenerator(bitmap: Bitmap?) {
-        val model = Model.newInstance(this)
-        // converting bitmap into tensor flow image
-        val newBitmap = bitmap?.copy(Bitmap.Config.ARGB_8888, true)
-        val tfImage = TensorImage.fromBitmap(newBitmap).tensorBuffer
+    private fun outputGenerator(image: Bitmap?) {
+        try {
+            val model = Model.newInstance(this)
 
-        //process the image using trained model and sort it in descending order
-        val outputs = model.process(tfImage)
-            .outputFeature0AsTensorBuffer
+            // Creates inputs for reference.
+            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
+            val byteBuffer = ByteBuffer.allocateDirect(6 * imageSize * imageSize * 3)
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            // get 1D array of 224 * 224 pixels in image
+            val intValues = intArrayOf(imageSize*imageSize)
+            image?.getPixels(intValues, 0, image.getWidth(), 0, 0, image.getWidth(), image.getHeight());
+
+            // iterate over pixels and extract R, G, and B values. Add to bytebuffer.
+            var pixel = 0
+            for(i in 0 until imageSize){
+                for(j in 0 until imageSize){
+                    val value = intValues[pixel++] // RGB
+//                    byteBuffer.putFloat(((value shr 16).toFloat()) and 0XFF)
+//                    byteBuffer.putFloat((((value shr 8).toFloat()) & 0xFF) * (1.f / 255.f))
+//                    byteBuffer.putFloat((value and 0xFF) * (1.f/ 255.f))
+                    byteBuffer.putFloat((value shr 16 and 0xFF) * (1f / 255f))
+                    byteBuffer.putFloat((value shr 8 and 0xFF) * (1f / 255f))
+                    byteBuffer.putFloat((value and 0xFF) * (1f / 255f))
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            val outputs = model.process(inputFeature0);
+            val outputFeature0 = outputs.outputFeature0AsTensorBuffer
+
+            val confidences = outputFeature0.floatArray
+            val size = confidences.size
+            // find the index of the class with the biggest confidence.
+            var maxPos = 0
+            var maxConfidence = 0F
+            for(i in 0 until size){
+                if(confidences[i] > maxConfidence){
+                    maxConfidence = confidences[i]
+                    maxPos = i
+                }
+            }
+            binding.result.text = instruments[maxPos]
 
 
 
-
+            // Releases model resources if no longer used.
+            model.close();
+        } catch (e: IOException) {
+            Log.d(TAG, "outputGenerator: ${e.message}")
+        }
     }
+
 
 }
