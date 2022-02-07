@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                 val resultUri: Uri = result.uri
                 val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(resultUri))
                 outputGenerator(bitmap)
-                binding.image.setImageURI(resultUri)
+                //binding.image.setImageURI(resultUri)
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error
                 Log.d(TAG, "onActivityResult: ${error.message}")
@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity() {
             byteBuffer.order(ByteOrder.nativeOrder());
 
             // get 1D array of 224 * 224 pixels in image
-            val intValues = intArrayOf(imageSize*imageSize)
-            image?.getPixels(intValues, 0, image.getWidth(), 0, 0, image.getWidth(), image.getHeight());
+            val intValues = IntArray(imageSize*imageSize)
+            image?.getPixels(intValues, 0, image.width, 0, 0, image.width, image.height);
 
             // iterate over pixels and extract R, G, and B values. Add to bytebuffer.
             var pixel = 0
